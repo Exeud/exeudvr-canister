@@ -1,0 +1,59 @@
+# Robots.txt for WebXR Experience
+# Optimized for performance and selective indexing
+
+# General access with performance considerations
+User-agent: *
+Allow: /
+Disallow: /src/assets/
+Disallow: /src/assets/Build/
+Disallow: /src/assets/auth/
+Disallow: /src/assets/utils/
+Disallow: /runtime-logs/
+Disallow: /user-data/
+Crawl-delay: 5
+
+# Essential content for indexing
+Allow: /manifest.json
+Allow: /metadata/
+Allow: /accessibility/
+Allow: /thumbnails/
+Allow: /descriptions/
+
+# Search engine specific optimizations
+User-agent: Googlebot
+Allow: /
+Disallow: /src/assets/
+Disallow: /src/assets/Build/
+Disallow: /src/assets/auth/
+Disallow: /src/assets/utils/
+Allow: /manifest.json
+Allow: /webxr-metadata.json
+Crawl-delay: 3
+
+# AI and research considerations
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: Google-Extended
+Allow: /metadata/
+Allow: /accessibility/
+Disallow: /assets/
+Disallow: /interactive/
+
+# Specialized WebXR crawlers (future-proofing)
+User-agent: WebXRBot
+Allow: /
+Allow: /assets/3d/low-poly/
+Allow: /metadata/
+Disallow: /assets/3d/high-poly/
+Disallow: /assets/textures/
+Crawl-delay: 10
+
+User-agent: ImmersiveBot
+Allow: /webxr-metadata.json
+Allow: /scene-graph.json
+Allow: /interaction-map.json
+Disallow: /assets/
