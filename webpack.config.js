@@ -2,7 +2,6 @@ const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
 
 let localCanisters, prodCanisters, canisters;
 
@@ -112,15 +111,6 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],
       process: require.resolve("process/browser"),
-    }),
-    new CopyPlugin({
-      patterns: [
-        {
-          from: path.join(__dirname, "src", "assets"),
-          to: path.join(__dirname, "dist"),
-          globOptions: { ignore: ["**/favicon.ico"] },
-        },
-      ],
     }),
   ],
   // proxy /api to port 4943 during development

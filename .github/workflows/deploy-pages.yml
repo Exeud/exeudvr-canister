@@ -134,6 +134,7 @@ jobs:
         dfx canister create backend
         dfx generate backend
         dfx canister create frontend
+        dfx generate frontend
 
     - name: Build and deploy to local replica
       env:
@@ -142,7 +143,7 @@ jobs:
         CANISTER_ID_BACKEND: bkyz2-fmaaa-aaaaa-qaaaq-cai
         CANISTER_ID_INTERNET_IDENTITY: rdmx6-jaaaa-aaaaa-aaadq-cai
         NODE_ENV: production
-      run: npm run build && dfx deploy
+      run: dfx deploy
 
     - name: Install bore and open tunnel
       id: tunnel
@@ -160,19 +161,71 @@ jobs:
       run: |
         FRONTEND_URL="${{ steps.tunnel.outputs.canister_url }}"
         mkdir -p _site
-        cat > _site/index.html << EOF
-        <!DOCTYPE html>
-        <html lang="en">
-          <head>
-            <meta charset="UTF-8" />
-            <meta http-equiv="refresh" content="0; url=${FRONTEND_URL}" />
-            <title>ExeuδVR</title>
-          </head>
-          <body>
-            <p>Redirecting to <a href="${FRONTEND_URL}">${FRONTEND_URL}</a>…</p>
-          </body>
-        </html>
-        EOF
+        cat > _site/index.html << HTMLEOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ExeuδVR</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #0e0e10; color: #e8e8e8;
+           display: flex; flex-direction: column; align-items: center; justify-content: center;
+           min-height: 100vh; margin: 0; gap: 1.5rem; }
+    h1 { font-size: 2rem; margin: 0; letter-spacing: .05em; }
+    p  { margin: 0; color: #aaa; }
+    a.launch { display: inline-block; padding: .75rem 2rem; background: #6c47ff;
+               color: #fff; border-radius: 8px; text-decoration: none; font-size: 1.1rem;
+               font-weight: 600; transition: background .2s; }
+    a.launch:hover { background: #8a6aff; }
+    button { padding: .65rem 1.8rem; background: #222; color: #e8e8e8; border: 1px solid #444;
+             border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background .2s; }
+    button:hover { background: #333; }
+    button:disabled { opacity: .5; cursor: default; }
+    #status { font-size: .9rem; color: #aaa; min-height: 1.2em; }
+  </style>
+</head>
+<body>
+  <h1>Exeu&#x03B4;VR</h1>
+  <a class="launch" href="${FRONTEND_URL}">Open App</a>
+  <p>Replica is live for ~20 minutes after each deploy.</p>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:.75rem;margin-top:1rem">
+    <button id="wakeBtn" onclick="wake()">Wake up replica (20 min)</button>
+    <div id="status"></div>
+  </div>
+  <script>
+    async function wake() {
+      const btn = document.getElementById('wakeBtn');
+      const status = document.getElementById('status');
+      const token = prompt('GitHub PAT (actions:write scope):');
+      if (!token) return;
+      btn.disabled = true;
+      status.textContent = 'Triggering workflow…';
+      try {
+        const res = await fetch(
+          'https://api.github.com/repos/Exeud/exeudvr-canister/actions/workflows/deploy-pages.yml/dispatches',
+          { method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token,
+                       'Accept': 'application/vnd.github+json',
+                       'Content-Type': 'application/json' },
+            body: JSON.stringify({ ref: 'develop', inputs: { target: 'pages' } }) }
+        );
+        if (res.status === 204) {
+          status.textContent = '✅ Workflow triggered! Allow ~5 min for the replica to come up, then reload.';
+        } else {
+          const body = await res.json().catch(() => ({}));
+          status.textContent = '❌ ' + (body.message || 'HTTP ' + res.status);
+          btn.disabled = false;
+        }
+      } catch(e) {
+        status.textContent = '❌ ' + e.message;
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
+HTMLEOF
 
     - name: Setup Pages
       uses: actions/configure-pages@v5
@@ -185,3 +238,12 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+
+    - name: Keep replica and tunnel alive
+      run: |
+        MINUTES=${TUNNEL_MINUTES:-20}
+        echo "Keeping tunnel alive for ${MINUTES} minutes..."
+        echo "Visit: ${{ steps.tunnel.outputs.canister_url }}"
+        sleep $((MINUTES * 60))
+      env:
+        TUNNEL_MINUTES: ${{ vars.TUNNEL_MINUTES }}
