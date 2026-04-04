@@ -122,6 +122,7 @@ jobs:
         dfx canister create backend
         dfx generate backend
         dfx canister create frontend
+        dfx build
 
     - name: Build and deploy to local replica
       env:

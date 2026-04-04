@@ -6,9 +6,9 @@
   "scripts": {
     "check-dfx": "node src/scripts/check-dfx.js",
     "presetup": "sudo apt-get update && sudo apt-get install -y inotify-tools jq && npm run check-dfx",
-    "setup": "npm i && dfx deps pull && dfx canister create backend && dfx generate backend && dfx canister create frontend",
+    "setup": "npm i && dfx deps pull && dfx canister create backend && dfx generate backend && dfx canister create frontend && dfx build",
     "prebuild": "npm run unity",
-    "build": "tsc && webpack && dfx generate frontend",
+    "build": "tsc && webpack",
     "unity": "nohup bash src/scripts/unity.sh > src/unity/unity_watch.log 2>&1 &",
     "prestart": "pkill -f 'bash src/scripts/unity.sh' &",
     "start": "dfx deps deploy && npm run backend & npm run frontend",
