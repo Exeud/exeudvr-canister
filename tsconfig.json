@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "baseUrl": "./",
     "outDir": "./dist",
     "rootDir": "src",
     "useDefineForClassFields": true,
@@ -14,14 +13,14 @@
     "strict": false,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
     "jsx": "react-jsx",
     "types": ["node"],
     "paths": {
-      "unity": ["dist/unity"]
+      "unity": ["./dist/unity"]
     }
   },
   "include": [
