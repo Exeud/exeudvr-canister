@@ -143,22 +143,10 @@ jobs:
         NODE_ENV: production
       run: npm run build && dfx deploy
 
-    - name: Install bore and open tunnel
-      id: tunnel
-      run: |
-        cargo install bore-cli
-        bore local 4943 --to bore.pub > /tmp/bore.log 2>&1 &
-        sleep 6
-        REMOTE_PORT=$(grep -oP 'remote_port=\K[0-9]+' /tmp/bore.log \
-          || grep -oP 'listening at bore\.pub:\K[0-9]+' /tmp/bore.log \
-          || grep -oP 'port \K[0-9]+' /tmp/bore.log)
-        echo "remote_port=$REMOTE_PORT" >> $GITHUB_OUTPUT
-        echo "canister_url=http://bore.pub:${REMOTE_PORT}/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai" >> $GITHUB_OUTPUT
-
-    - name: Build Pages redirect
+    - name: Build Pages site
       run: |
         mkdir -p _site
-        FRONTEND_URL="${{ steps.tunnel.outputs.canister_url }}" \
+        FRONTEND_URL="http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:4943/" \
           envsubst '$FRONTEND_URL' < .github/pages/index.html > _site/index.html
 
     - name: Setup Pages
@@ -176,8 +164,8 @@ jobs:
     - name: Keep replica alive
       run: |
         MINUTES=${TUNNEL_MINUTES:-10}
-        echo "Keeping tunnel alive for ${MINUTES} minutes..."
-        echo "Visit: ${{ steps.tunnel.outputs.canister_url }}"
+        echo "Keeping replica alive for ${MINUTES} minutes..."
+        echo "Visit: https://exeud.github.io/exeudvr-canister/"
         sleep $((MINUTES * 60))
       env:
         TUNNEL_MINUTES: ${{ vars.TUNNEL_MINUTES }}
