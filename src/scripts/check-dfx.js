@@ -11,5 +11,5 @@ try {
   console.log(`Certified Height: ${pingData.certified_height}`);
 } catch (error) {
   console.log('dfx is not running. Starting dfx...');
-  execSync('dfx +0.22.0 start --clean --background', { stdio: 'inherit' });
+  execSync('dfx +0.24.3 start --clean --background', { stdio: 'inherit' });
 }

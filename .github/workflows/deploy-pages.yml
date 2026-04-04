@@ -1,0 +1,144 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ "develop" ]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deploy target"
+        required: true
+        default: "playground"
+        type: choice
+        options:
+          - playground
+          - pages
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # ── Playground: deploy backend+frontend to IC Playground, redirect Pages to it ──
+  deploy-playground:
+    if: ${{ github.event_name == 'push' || inputs.target == 'playground' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20.x
+        cache: 'npm'
+
+    - name: Install dfx
+      uses: dfinity/setup-dfx@main
+      with:
+        dfx-version: "0.24.3"
+
+    - name: Install dependencies
+      run: npm i
+
+    - name: Create canisters on playground
+      run: dfx canister create --network playground backend frontend
+
+    - name: Read canister IDs
+      id: canister_ids
+      run: |
+        BACKEND_ID=$(dfx canister id backend --network playground)
+        FRONTEND_ID=$(dfx canister id frontend --network playground)
+        echo "backend_id=$BACKEND_ID" >> $GITHUB_OUTPUT
+        echo "frontend_id=$FRONTEND_ID" >> $GITHUB_OUTPUT
+
+    - name: Build frontend
+      env:
+        DFX_NETWORK: playground
+        CANISTER_ID_BACKEND: ${{ steps.canister_ids.outputs.backend_id }}
+        CANISTER_ID_FRONTEND: ${{ steps.canister_ids.outputs.frontend_id }}
+        CANISTER_ID_INTERNET_IDENTITY: rdmx6-jaaaa-aaaaa-aaadq-cai
+        NODE_ENV: production
+      run: tsc && webpack --mode production
+
+    - name: Deploy to playground
+      run: dfx deploy --network playground backend frontend
+
+    - name: Build Pages redirect
+      run: |
+        FRONTEND_URL="https://${{ steps.canister_ids.outputs.frontend_id }}.icp0.io"
+        mkdir -p _site
+        cat > _site/index.html << EOF
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="UTF-8" />
+            <meta http-equiv="refresh" content="0; url=${FRONTEND_URL}" />
+            <title>ExeuδVR</title>
+          </head>
+          <body>
+            <p>Redirecting to <a href="${FRONTEND_URL}">${FRONTEND_URL}</a>…</p>
+          </body>
+        </html>
+        EOF
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: _site
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
+
+  # ── Pages-only: serve the React frontend statically (no backend, errors trapped) ──
+  deploy-pages-only:
+    if: ${{ inputs.target == 'pages' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20.x
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm i
+
+    - name: Build frontend (static, no backend)
+      env:
+        CANISTER_ID_BACKEND: aaaaa-aa
+        CANISTER_ID_FRONTEND: aaaaa-aa
+        CANISTER_ID_INTERNET_IDENTITY: rdmx6-jaaaa-aaaaa-aaadq-cai
+        NODE_ENV: production
+        REACT_APP_NO_BACKEND: "true"
+      run: tsc && webpack --mode production
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: dist
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2

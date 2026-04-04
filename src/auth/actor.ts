@@ -4,6 +4,18 @@ import { idlFactory } from  '../declarations/backend';
 
 const isLocalEnv = process.env.NODE_ENV !== "production";
 const canisterId = process.env.CANISTER_ID_BACKEND;
+const noBackend = !canisterId || canisterId === "aaaaa-aa";
+
+function createNoopActor(): _SERVICE {
+  return new Proxy({} as _SERVICE, {
+    get: (_target, prop) => {
+      if (typeof prop === "string") {
+        return (..._args: unknown[]) =>
+          Promise.reject(new Error(`[no-backend] canister call '${prop}' skipped`));
+      }
+    },
+  });
+}
 
 function createActor(identity?: Identity) {
   const agent = new HttpAgent({
@@ -31,6 +43,7 @@ class ActorController {
   }
 
   async initBaseActor(identity?: Identity) {
+    if (noBackend) return createNoopActor();
     const { agent, actor } = createActor(identity);
     // The root key only has to be fetched for local development environments
     if (isLocalEnv) {

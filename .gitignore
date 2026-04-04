@@ -46,7 +46,3 @@ canister_ids.json
 .env.test
 .env.production
 
-# Unity build data
-src/assets/Build/*
-!src/assets/Build/
-src/unity/UnityBuildInfo.json

@@ -7,7 +7,15 @@ const CopyPlugin = require("copy-webpack-plugin");
 let localCanisters, prodCanisters, canisters;
 
 function initCanisterEnv() {
-  
+
+  if (process.env.CANISTER_ID_BACKEND && process.env.CANISTER_ID_FRONTEND) {
+    return {
+      CANISTER_ID_BACKEND: process.env.CANISTER_ID_BACKEND,
+      CANISTER_ID_FRONTEND: process.env.CANISTER_ID_FRONTEND,
+      CANISTER_ID_INTERNET_IDENTITY: process.env.CANISTER_ID_INTERNET_IDENTITY,
+    };
+  }
+
   try {
     localCanisters = require(path.resolve(
       ".dfx",
@@ -97,13 +105,18 @@ module.exports = {
       cache: false,
     }),
 	  new webpack.EnvironmentPlugin({
-      CANISTER_ID_BACKEND: canisters["backend"],
-      CANISTER_ID_FRONTEND: canisters["frontend"],
-      CANISTER_ID_INTERNET_IDENTITY: ["http://localhost:4943/?canisterId=rdmx6-jaaaa-aaaaa-aaadq-cai"]
+      CANISTER_ID_BACKEND: canisterEnvVariables["CANISTER_ID_BACKEND"],
+      CANISTER_ID_FRONTEND: canisterEnvVariables["CANISTER_ID_FRONTEND"],
+      CANISTER_ID_INTERNET_IDENTITY: canisterEnvVariables["CANISTER_ID_INTERNET_IDENTITY"] || "http://localhost:4943/?canisterId=rdmx6-jaaaa-aaaaa-aaadq-cai"
     }),
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],
       process: require.resolve("process/browser"),
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: path.join(__dirname, "src", "assets"), to: path.join(__dirname, "dist") },
+      ],
     }),
   ],
   // proxy /api to port 4943 during development

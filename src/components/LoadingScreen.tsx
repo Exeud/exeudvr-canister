@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import UnityBuildInfo from "../unity/UnityBuildInfo.json";
 
@@ -29,10 +29,19 @@ const StyledBanner = styled.div<{ duration: number, progress: number }>`
 const StyledImage = styled.img`
   display: flex;
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const LoadingScreenContainer = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 1000;
 `;
 
 const startTime = Date.now();
-
 
 const totalSize = parseInt(dataSize) + parseInt(wasmSize);
 const loadSize = (Math.round((totalSize / 1048576) * 100) / 100);
@@ -82,12 +91,12 @@ const LoadingScreen: React.FC = () => {
       }, [progress])
   
     return (
-      <Fragment>    
+      <LoadingScreenContainer>    
         <StyledBanner 
           duration={estimatedLoadingTime} 
           progress={progress}/>
         <StyledImage src={img} alt="ExeuδVR"/>
-        </Fragment>
+      </LoadingScreenContainer>
     );
 };
 

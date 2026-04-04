@@ -28,10 +28,10 @@ jobs:
     - name: Install dfx
       uses: dfinity/setup-dfx@main
       with: 
-        dfx-version: "0.22.0"
+        dfx-version: "0.24.3"
     - name: Confirm successful installation
       run: dfx --version
     - name: Start dfx
-      run: dfx +0.22.0 start --clean --background
+      run: dfx +0.24.3 start --clean --background
     - run: npm run setup
     - run: npm test
