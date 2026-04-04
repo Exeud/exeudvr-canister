@@ -115,7 +115,11 @@ module.exports = {
     }),
     new CopyPlugin({
       patterns: [
-        { from: path.join(__dirname, "src", "assets"), to: path.join(__dirname, "dist") },
+        {
+          from: path.join(__dirname, "src", "assets"),
+          to: path.join(__dirname, "dist"),
+          globOptions: { ignore: ["**/favicon.ico"] },
+        },
       ],
     }),
   ],
