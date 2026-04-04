@@ -6,6 +6,22 @@ const isLocalEnv = process.env.NODE_ENV !== "production";
 const canisterId = process.env.CANISTER_ID_BACKEND;
 const noBackend = !canisterId || canisterId === "aaaaa-aa";
 
+function resolveAgentHost(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  const { hostname, origin, protocol } = window.location;
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return "http://127.0.0.1:4943";
+  }
+  if (hostname === "bore.pub" || protocol === "http:") {
+    return origin;
+  }
+  return undefined;
+}
+
+const agentHost = resolveAgentHost();
+const needsRootKey = isLocalEnv ||
+  (typeof window !== "undefined" && window.location.protocol === "http:");
+
 function createNoopActor(): _SERVICE {
   return new Proxy({} as _SERVICE, {
     get: (_target, prop) => {
@@ -18,14 +34,8 @@ function createNoopActor(): _SERVICE {
 }
 
 function createActor(identity?: Identity) {
-  const agent = new HttpAgent({
-	     identity,
-	     host: window.location.href.includes('localhost') ? 'http://127.0.0.1:4943' : undefined,
-       });
-  const actor = Actor.createActor<_SERVICE>(idlFactory, {
-    agent,
-	canisterId
-  });
+  const agent = new HttpAgent({ identity, host: agentHost });
+  const actor = Actor.createActor<_SERVICE>(idlFactory, { agent, canisterId });
   return { actor, agent };
 }
 
@@ -45,8 +55,7 @@ class ActorController {
   async initBaseActor(identity?: Identity) {
     if (noBackend) return createNoopActor();
     const { agent, actor } = createActor(identity);
-    // The root key only has to be fetched for local development environments
-    if (isLocalEnv) {
+    if (needsRootKey) {
       await agent.fetchRootKey();
     }
     return actor;

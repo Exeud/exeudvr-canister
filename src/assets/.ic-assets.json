@@ -6,9 +6,8 @@
     {
         "match": "**/*",
         "allow_raw_access": false,
-        "security_policy": "standard",
         "headers": {
-            "Content-Security-Policy": "default-src 'self';script-src 'self' 'unsafe-eval';connect-src 'self' https://icp-api.io https://*.icp0.io https://*.ic0.app;img-src 'self' data: https:;style-src * 'unsafe-inline';style-src-elem * 'unsafe-inline';font-src *;object-src 'none';base-uri 'self';frame-ancestors 'none';form-action 'self';upgrade-insecure-requests;require-trusted-types-for 'script';",
+            "Content-Security-Policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval';script-src-elem 'self' 'unsafe-inline';connect-src 'self' http://bore.pub:* https://icp-api.io https://*.icp0.io https://*.ic0.app;img-src 'self' data: https:;style-src * 'unsafe-inline';style-src-elem * 'unsafe-inline';font-src *;object-src 'none';base-uri 'self';frame-ancestors 'none';form-action 'self';upgrade-insecure-requests;",
             "X-Frame-Options": "DENY",
             "Referrer-Policy": "same-origin",
             "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
@@ -53,6 +52,13 @@
     },
     {
         "match": "**/*.js.br",
+        "headers": {
+            "Content-Type": "application/javascript",
+            "Content-Encoding": "br"
+        }
+    },
+    {
+        "match": "**/*.framework.js.br",
         "headers": {
             "Content-Type": "application/javascript",
             "Content-Encoding": "br"

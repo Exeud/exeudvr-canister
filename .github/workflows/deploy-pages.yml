@@ -173,9 +173,9 @@ jobs:
       id: deployment
       uses: actions/deploy-pages@v4
 
-    - name: Keep replica alive for 20 mins
+    - name: Keep replica alive
       run: |
-        MINUTES=${TUNNEL_MINUTES:-20}
+        MINUTES=${TUNNEL_MINUTES:-10}
         echo "Keeping tunnel alive for ${MINUTES} minutes..."
         echo "Visit: ${{ steps.tunnel.outputs.canister_url }}"
         sleep $((MINUTES * 60))

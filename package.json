@@ -9,6 +9,7 @@
     "setup": "npm i && dfx deps pull && dfx canister create backend && dfx generate backend && dfx canister create frontend && dfx build",
     "prebuild": "npm run unity",
     "build": "tsc && webpack",
+    "postbuild": "cp src/assets/.ic-assets.json dist/.ic-assets.json",
     "unity": "nohup bash src/scripts/unity.sh > src/unity/unity_watch.log 2>&1 &",
     "prestart": "pkill -f 'bash src/scripts/unity.sh' &",
     "start": "dfx deps deploy && npm run backend & npm run frontend",

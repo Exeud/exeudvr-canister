@@ -24,9 +24,9 @@
 <body>
   <h1>Exeu&#x03B4;VR</h1>
   <a class="launch" href="${FRONTEND_URL}">Open App</a>
-  <p>Replica is live for ~20 minutes after each deploy.</p>
+  <p>Replica is live for ~10 minutes at a time, to prevent wasteful resource usage.</p>
   <div style="display:flex;flex-direction:column;align-items:center;gap:.75rem;margin-top:1rem">
-    <button id="wakeBtn" onclick="wake()">Wake up replica (20 min)</button>
+    <button id="wakeBtn" onclick="wake()">Wake up replica (10 min). Please allow 1-2 minutes for deployment.</button>
     <div id="status"></div>
   </div>
   <script>
@@ -47,7 +47,7 @@
             body: JSON.stringify({ ref: 'develop', inputs: { target: 'pages' } }) }
         );
         if (res.status === 204) {
-          status.textContent = '\u2705 Workflow triggered! Allow ~5 min then reload.';
+          status.textContent = '\u2705 Workflow triggered! Allow ~10 min then reload.';
         } else {
           const body = await res.json().catch(() => ({}));
           status.textContent = '\u274c ' + (body.message || 'HTTP ' + res.status);
