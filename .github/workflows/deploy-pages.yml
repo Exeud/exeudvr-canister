@@ -122,7 +122,6 @@ jobs:
         dfx canister create backend
         dfx generate backend
         dfx canister create frontend
-        dfx generate frontend
 
     - name: Build and deploy to local replica
       env:
@@ -131,7 +130,7 @@ jobs:
         CANISTER_ID_BACKEND: bkyz2-fmaaa-aaaaa-qaaaq-cai
         CANISTER_ID_INTERNET_IDENTITY: rdmx6-jaaaa-aaaaa-aaadq-cai
         NODE_ENV: production
-      run: dfx deploy
+      run: npm run build && dfx deploy
 
     - name: Install bore and open tunnel
       id: tunnel
