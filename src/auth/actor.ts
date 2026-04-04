@@ -8,19 +8,15 @@ const noBackend = !canisterId || canisterId === "aaaaa-aa";
 
 function resolveAgentHost(): string | undefined {
   if (typeof window === "undefined") return undefined;
-  const { hostname, origin, protocol } = window.location;
-  if (hostname === "localhost" || hostname === "127.0.0.1") {
+  const { hostname } = window.location;
+  if (hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".localhost")) {
     return "http://127.0.0.1:4943";
-  }
-  if (hostname === "bore.pub" || protocol === "http:") {
-    return origin;
   }
   return undefined;
 }
 
 const agentHost = resolveAgentHost();
-const needsRootKey = isLocalEnv ||
-  (typeof window !== "undefined" && window.location.protocol === "http:");
+const needsRootKey = !!agentHost;
 
 function createNoopActor(): _SERVICE {
   return new Proxy({} as _SERVICE, {
