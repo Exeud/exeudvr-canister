@@ -26,7 +26,7 @@ permissions:
 jobs:
   # ── Playground: deploy backend+frontend to IC Playground, redirect Pages to it ──
   deploy-playground:
-    if: ${{ github.event_name == 'push' || inputs.target == 'playground' }}
+    if: ${{ (github.event_name == 'push' && vars.DEPLOY_TARGET == 'playground') || inputs.target == 'playground' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -50,7 +50,7 @@ jobs:
       run: npm i
 
     - name: Create canisters on playground
-      run: dfx canister create --network playground backend frontend
+      run: dfx canister create --all --network playground
 
     - name: Read canister IDs
       id: canister_ids
@@ -104,7 +104,7 @@ jobs:
 
   # ── Pages-only: serve the React frontend statically (no backend, errors trapped) ──
   deploy-pages-only:
-    if: ${{ inputs.target == 'pages' }}
+    if: ${{ (github.event_name == 'push' && vars.DEPLOY_TARGET != 'playground') || inputs.target == 'pages' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages

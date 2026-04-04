@@ -6,6 +6,7 @@
     {
         "match": "**/*",
         "allow_raw_access": false,
+        "security_policy": "standard",
         "headers": {
             "Content-Security-Policy": "default-src 'self';script-src 'self' 'unsafe-eval';connect-src 'self' https://icp-api.io https://*.icp0.io https://*.ic0.app;img-src 'self' data: https:;style-src * 'unsafe-inline';style-src-elem * 'unsafe-inline';font-src *;object-src 'none';base-uri 'self';frame-ancestors 'none';form-action 'self';upgrade-insecure-requests;require-trusted-types-for 'script';",
             "X-Frame-Options": "DENY",
