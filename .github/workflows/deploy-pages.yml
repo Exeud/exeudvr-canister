@@ -46,6 +46,11 @@ jobs:
       with:
         dfx-version: "0.24.3"
 
+    - name: Install mops (provides moc)
+      run: |
+        npm i -g ic-mops
+        mops install
+
     - name: Install dependencies
       run: npm i
 
@@ -112,6 +117,11 @@ jobs:
       with:
         dfx-version: "0.24.3"
 
+    - name: Install mops
+      run: |
+        npm i -g ic-mops
+        mops install
+
     - name: Install dependencies and start replica
       run: |
         sudo apt-get install -y inotify-tools jq
@@ -163,7 +173,7 @@ jobs:
       id: deployment
       uses: actions/deploy-pages@v4
 
-    - name: Keep replica and tunnel alive
+    - name: Keep replica alive for 20 mins
       run: |
         MINUTES=${TUNNEL_MINUTES:-20}
         echo "Keeping tunnel alive for ${MINUTES} minutes..."
