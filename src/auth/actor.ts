@@ -2,7 +2,6 @@ import { Actor, HttpAgent, Identity } from "@dfinity/agent";
 import { _SERVICE } from "../declarations/backend/backend.did";
 import { idlFactory } from  '../declarations/backend';
 
-const isLocalEnv = process.env.NODE_ENV !== "production";
 const canisterId = process.env.CANISTER_ID_BACKEND;
 const noBackend = !canisterId || canisterId === "aaaaa-aa";
 
@@ -16,7 +15,7 @@ function resolveAgentHost(): string | undefined {
 }
 
 const agentHost = resolveAgentHost();
-const needsRootKey = !!agentHost;
+const needsRootKey = !!agentHost && process.env.NODE_ENV !== "production";
 
 function createNoopActor(): _SERVICE {
   return new Proxy({} as _SERVICE, {

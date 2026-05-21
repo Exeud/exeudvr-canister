@@ -18,16 +18,15 @@ class AuthClientWrapper {
   }
 
   async login(): Promise<Identity | undefined> {
-    return new Promise(async (resolve) => {
-      const localII = "http://127.0.0.1:4943/?canisterId=" + process.env.CANISTER_ID_INTERNET_IDENTITY;
-      await this.authClient?.login({
-        identityProvider: 
-        process.env.NODE_ENV === "production"
-          ? "https://identity.ic0.app/#authorize"
-          : localII,
-        onSuccess: async () => {  
-          resolve(this.authClient?.getIdentity());
-        },
+    const localII = "http://127.0.0.1:4943/?canisterId=" + process.env.CANISTER_ID_INTERNET_IDENTITY;
+    return new Promise((resolve, reject) => {
+      this.authClient?.login({
+        identityProvider:
+          process.env.NODE_ENV === "production"
+            ? "https://identity.ic0.app/#authorize"
+            : localII,
+        onSuccess: () => resolve(this.authClient?.getIdentity()),
+        onError: (err) => reject(new Error(err)),
       });
     });
   }

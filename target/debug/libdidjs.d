@@ -1,1 +1,0 @@
-/home/willg/ic-projects/icvr-react/target/debug/libdidjs.so: /home/willg/ic-projects/icvr-react/src/utils/didjs/../../../dist/frontend/index.html /home/willg/ic-projects/icvr-react/src/utils/didjs/../../../dist/frontend/index.js /home/willg/ic-projects/icvr-react/src/utils/didjs/lib.rs

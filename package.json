@@ -76,7 +76,6 @@
   ],
   "dependencies": {
     "@dfinity/identity": "^3.4.3",
-    "cargo": "^0.8.0",
     "decompress": "^4.2.1",
     "decompress-unzip": "^4.0.1",
     "local-storage": "^2.0.0",
@@ -91,8 +90,6 @@
     "react-unity-webgl": "8.8.0",
     "redux": "^4.2.1",
     "rsync": "^0.6.1",
-    "rustup": "^1.0.10",
-    "styled-components": "^6.0.9",
-    "wasm-opt": "^1.4.0"
+    "styled-components": "^6.0.9"
   }
 }

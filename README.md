@@ -10,7 +10,6 @@ This project connects Unity's C# functionality (user interaction) to TypeScript 
 
 - TypeScript everywhere, but with JavaScript compatibility.
 - Node.js: Easily add JavaScript packages to extend functionality.
-- Rust: Add crates with Cargo.
 - Motoko: Connects to the **mops** package manager, for Web 3.0 functionality.
 
 ```js 

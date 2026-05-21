@@ -16,6 +16,7 @@ target
 package-lock.json
 Cargo.lock
 *.local
+UnityBuildInfo.json
 
 # Editor directories and files
 .vscode/*
